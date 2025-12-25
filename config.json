@@ -1,0 +1,41 @@
+{
+  "data_dir": ".",
+  "output_dir": "./outputs",
+  "collection": {
+    "queries": [
+      "document layout analysis deep learning",
+      "neural networks OCR text recognition",
+      "transformer document understanding",
+      "visual document analysis",
+      "table detection neural networks",
+      "figure extraction deep learning",
+      "PDF parsing machine learning",
+      "document image classification CNN",
+      "semantic document segmentation",
+      "multi-modal document understanding"
+    ],
+    "papers_per_query": 100,
+    "categories": [
+      "cs.CV",
+      "cs.CL",
+      "cs.LG"
+    ]
+  },
+  "model": {
+    "text_model": "sentence-transformers/all-mpnet-base-v2",
+    "embedding_dim": 768,
+    "final_dim": 512,
+    "batch_size": 32,
+    "num_epochs": 50,
+    "learning_rate": 3e-5,
+    "temperature": 0.05,
+    "device": "cuda"
+  },
+  "paths": {
+    "embeddings": "./embeddings",
+    "metadata": "./metadata",
+    "faiss": "./faiss",
+    "models": "./models",
+    "structures": "./structures"
+  }
+}
