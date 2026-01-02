@@ -111,8 +111,22 @@ if st.button("Search", type="primary") or (query and len(query) > 0):
                         arxiv_id = meta[idx]['arxiv_id']
                         score = scores[0][rank-1]
                         
+                        # Load full metadata
+                        meta_path = METADATA_DIR / f"{arxiv_id}.json"
+                        full_meta = None
+                        if meta_path.exists():
+                            try:
+                                with open(meta_path, 'r', encoding='utf-8') as f:
+                                    full_meta = json.load(f)
+                            except Exception as e:
+                                st.error(f"Error loading metadata: {e}")
+                        
                         # Create clickable arXiv link
                         st.markdown(f"**[{arxiv_id}](https://arxiv.org/abs/{arxiv_id})**")
+                        
+                        # Show title
+                        if full_meta and "title" in full_meta:
+                            st.markdown(f"**{full_meta['title']}**")
                         
                         if show_scores:
                             # Convert numpy float32 to Python float
@@ -120,27 +134,47 @@ if st.button("Search", type="primary") or (query and len(query) > 0):
                             st.progress(min(score_float, 1.0))
                             st.caption(f"Similarity: {score_float:.4f}")
                         
-                        if show_metadata:
-                            # Load full metadata if available
-                            meta_path = METADATA_DIR / f"{arxiv_id}.json"
-                            if meta_path.exists():
-                                full_meta = json.load(open(meta_path))
-                                
-                                if "title" in full_meta:
-                                    st.markdown(f"*{full_meta['title']}*")
-                                
-                                if "abstract" in full_meta:
-                                    with st.expander("Abstract"):
-                                        st.write(full_meta["abstract"])
-                                
-                                if "authors" in full_meta:
-                                    st.caption(f"Authors: {', '.join(full_meta['authors'][:3])}{'...' if len(full_meta['authors']) > 3 else ''}")
-                            else:
-                                # Show minimal metadata from FAISS meta
+                        if show_metadata and full_meta:
+                            # Show authors
+                            if "authors" in full_meta and full_meta["authors"]:
+                                authors_list = full_meta['authors']
+                                if len(authors_list) > 3:
+                                    authors_str = ', '.join(authors_list[:3]) + f' +{len(authors_list)-3} more'
+                                else:
+                                    authors_str = ', '.join(authors_list)
+                                st.caption(f"👥 Authors: {authors_str}")
+                            
+                            # Show categories
+                            if "categories" in full_meta and full_meta["categories"]:
+                                cats = full_meta['categories'][:3]
+                                st.caption(f"🏷️ Categories: {', '.join(cats)}")
+                            
+                            # Show publication date
+                            if "published" in full_meta:
+                                pub_date = full_meta['published'].split('T')[0]
+                                st.caption(f"📅 Published: {pub_date}")
+                            
+                            # Show abstract in expander
+                            if "abstract" in full_meta and full_meta["abstract"]:
+                                with st.expander("📄 Abstract"):
+                                    st.write(full_meta["abstract"])
+                            
+                            # Show additional info
+                            col_a, col_b = st.columns(2)
+                            with col_a:
                                 if meta[idx].get('num_pages'):
-                                    st.caption(f"Pages: {meta[idx]['num_pages']}")
+                                    st.caption(f"📖 Pages: {meta[idx]['num_pages']}")
+                            with col_b:
                                 if meta[idx].get('num_elements'):
-                                    st.caption(f"Elements: {meta[idx]['num_elements']}")
+                                    st.caption(f"🔢 Elements: {meta[idx]['num_elements']}")
+                        
+                        elif not full_meta:
+                            st.warning(f"Metadata file not found for {arxiv_id}")
+                            # Show minimal metadata from FAISS meta
+                            if meta[idx].get('num_pages'):
+                                st.caption(f"📖 Pages: {meta[idx]['num_pages']}")
+                            if meta[idx].get('num_elements'):
+                                st.caption(f"🔢 Elements: {meta[idx]['num_elements']}")
                     
                     st.markdown("---")
 
