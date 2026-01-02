@@ -191,3 +191,4 @@ with st.expander("💡 Example Queries"):
 # Footer
 st.markdown("---")
 st.caption("Powered by FAISS, PyTorch, and Sentence Transformers")
+
