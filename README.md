@@ -9,6 +9,7 @@ The pipeline is built around arXiv papers (computer vision, NLP, and machine lea
 categories) and is designed to support structure-aware document understanding —
 combining textual, visual, and layout features into a single representation.
 
+checkout the paper SMMESR.pdf
 ---
 
 ## Features
